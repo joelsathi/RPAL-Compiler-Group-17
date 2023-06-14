@@ -154,6 +154,7 @@ private:
         return false;
     }
 
+    // Ama
     void standardize_let(Node *node)
     {
     }
@@ -213,10 +214,12 @@ private:
         node->children.push_back(e);
     }
 
+    // Ravindu
     void standadize_fcn_form(Node *node)
     {
     }
 
+    // Ama
     void standardize_lambda(Node *node)
     {
     }
@@ -354,6 +357,7 @@ private:
         rec_node->children.push_back(eq_node);
     }
 
+    // Ravindu
     void standardize_and(Node *node)
     {
     }
