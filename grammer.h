@@ -95,47 +95,6 @@ private:
 
     void E()
     {
-        if (this->curr_token.compare("let") == 0)
-        {
-            consume("let");
-            D();
-            if (this->curr_token.compare("in") == 0)
-            {
-                consume("in");
-            }
-            else
-            {
-                throw std::runtime_error("Can't parse the given input. \'in\' is missing");
-            }
-            E();
-
-            this->AST.build_tree("let", 2);
-        }
-        else if (this->curr_token.compare("fn") == 0)
-        {
-            consume("fn");
-            int cnt = 0;
-            Vb();
-            cnt++;
-            while (this->curr_token.compare(".") != 0)
-            {
-                Vb();
-                cnt++;
-            }
-            if ((this->curr_token.compare(".")) == 0)
-                consume(".");
-            else
-                throw std::runtime_error("Can't parse the given input! \'.\' is missing");
-            E();
-            cnt++;
-
-            // std::cout << "Building node lambda" << endl;
-            this->AST.build_tree("lambda", cnt);
-        }
-        else
-        {
-            Ew();
-        }
     }
 
     void Ew()
@@ -287,107 +246,10 @@ private:
     // Boolean Primitive Expression
     void Bp()
     {
-        // std::cout << "Calling A from Bp with cur Token -> " << this->token << endl;
-        A();
-        if ((this->curr_token.compare("gr")) == 0 | (this->curr_token.compare(">")) == 0)
-        {
-            // std::cout << "Consuming " << this->token << " in Bp()" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node gr" << endl;
-            this->AST.build_tree("gr", 2);
-        }
-        else if ((this->curr_token.compare("ge")) == 0 | (this->curr_token.compare(">=")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Bp()" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node ge" << endl;
-            this->AST.build_tree("ge", 2);
-        }
-        else if ((this->curr_token.compare("ls")) == 0 | (this->curr_token.compare("<")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Bp()" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node ls" << endl;
-            this->AST.build_tree("ls", 2);
-        }
-        else if ((this->curr_token.compare("le")) == 0 | (this->curr_token.compare("<=")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Bp()" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node le" << endl;
-            this->AST.build_tree("le", 2);
-        }
-        else if ((this->curr_token.compare("eq")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Bp()" << endl;
-            consume("eq");
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node eq" << endl;
-            this->AST.build_tree("eq", 2);
-        }
-        else if ((this->curr_token.compare("ne")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Bp()" << endl;
-            consume("ne");
-            // std::cout << "Calling A from Bp with cur Token -> " << this->curr_token << endl;
-            A();
-
-            // std::cout << "Building node ne" << endl;
-            this->AST.build_tree("ne", 2);
-        }
     }
 
     void A()
     {
-
-        if ((this->curr_token.compare("+")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in A() as prefix plus" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
-            At();
-        }
-        else if ((this->curr_token.compare("-")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in A() as prefix minus" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
-            At();
-
-            // std::cout << "Building node neg" << endl;
-            this->AST.build_tree("neg", 1);
-        }
-        else
-        {
-            // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
-            At();
-        }
-
-        while ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
-        {
-            string temp = this->curr_token;
-            // std::cout << "Consuming " << this->curr_token << " in A()" << endl;
-            consume(this->curr_token);
-            // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
-            At();
-
-            // std::cout << "Building node " << temp << endl;
-            this->AST.build_tree(temp, 2);
-        }
     }
 
     void At()
@@ -409,18 +271,6 @@ private:
 
     void Af()
     {
-        // std::cout << "Calling Ap from Af with cur Token -> " << this->curr_token << endl;
-        Ap();
-        if ((this->curr_token.compare("**")) == 0)
-        {
-            // std::cout << "Consuming " << this->curr_token << " in Af()" << endl;
-            consume("**");
-            // std::cout << "Calling Af from Af with cur Token -> " << this->curr_token << endl;
-            Af();
-
-            // std::cout << "Building node **" << endl;
-            this->AST.build_tree("**", 2);
-        }
     }
 
     void Ap()

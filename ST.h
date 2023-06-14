@@ -156,57 +156,6 @@ private:
 
     void standardize_let(Node *node)
     {
-        Node *child_0 = node->children[0];
-        Node *child_1 = node->children[1];
-
-        Node *eq;
-        Node *p;
-        Node *e;
-
-        if (child_0->data.compare("=") == 0)
-        {
-            eq = child_0;
-            p = child_1;
-        }
-        else if (child_1->data.compare("=") == 0)
-        {
-            eq = child_1;
-            p = child_0;
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid let expression");
-        }
-
-        Node *x;
-        Node *e;
-
-        if (checkType(eq->children[0]->data, "identifier"))
-        {
-            x = eq->children[0];
-            e = eq->children[1];
-        }
-        else if (checkType(eq->children[1]->data, "identifier"))
-        {
-            x = eq->children[1];
-            e = eq->children[0];
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid syntax: Expected an identifier");
-        }
-
-        node->data = "gamma";
-        node->children.clear();
-
-        eq->data = "lambda";
-        eq->children.clear();
-
-        eq->children.push_back(x);
-        eq->children.push_back(p);
-
-        node->children.push_back(eq);
-        node->children.push_back(e);
     }
 
     void standardize_where(Node *node)
@@ -266,62 +215,10 @@ private:
 
     void standadize_fcn_form(Node *node)
     {
-        Node *p = node->children[0];
-
-        vector<Node *> vp_nodes;
-
-        for (int i = 1; i < node->children.size() - 1; i++)
-        {
-            Node *curr = node->children[i];
-            vp_nodes.push_back(curr);
-        }
-
-        Node *e = node->children[node->children.size() - 1];
-
-        node->children.clear();
-        node->data = "=";
-        node->children.push_back(p);
-
-        for (int i = 0; i < vp_nodes.size(); i++)
-        {
-            Node *curr_vp = vp_nodes[i];
-            Node *lambda = new Node();
-            lambda->data = "lambda";
-            lambda->children.push_back(curr_vp);
-
-            node->children.push_back(lambda);
-
-            node = lambda;
-        }
-
-        node->children.push_back(e);
     }
 
     void standardize_lambda(Node *node)
     {
-        vector<Node *> vp_nodes;
-
-        while (checkType(node->children[0]->data, "identifier"))
-        {
-            vp_nodes.push_back(node->children[0]);
-        }
-
-        Node *e = node->children[node->children.size() - 1];
-
-        node->children.clear();
-        node->children.push_back(vp_nodes[0]);
-
-        // If one variable lambda, then we don't need to do anything
-        for (int i = 1; i < vp_nodes.size(); i++)
-        {
-            Node *lambda = new Node();
-            lambda->data = "lambda";
-            lambda->children.push_back(vp_nodes[i]);
-            node->children.push_back(lambda);
-            node = lambda;
-        }
-
-        node->children.push_back(e);
     }
 
     void standardize_within(Node *node)
@@ -459,57 +356,6 @@ private:
 
     void standardize_and(Node *node)
     {
-        vector<Node *> eq_nodes;
-
-        for (int i = 0; i < node->children.size(); i++)
-        {
-            Node *curr = node->children[i];
-            if (curr->data.compare("=") != 0)
-            {
-                throw std::invalid_argument("Invalid and expression");
-            }
-            eq_nodes.push_back(curr);
-        }
-
-        node->data = "=";
-        node->children.clear();
-
-        Node *comma = new Node();
-        comma->data = ",";
-
-        Node *tau = new Node();
-        tau->data = "tau";
-
-        node->children.push_back(comma);
-        node->children.push_back(tau);
-
-        for (int i = 0; i < eq_nodes.size(); i++)
-        {
-            Node *curr_eq = eq_nodes[i];
-            Node *x;
-            Node *e;
-
-            if (checkType(curr_eq->children[0]->data, "identifier"))
-            {
-                x = curr_eq->children[0];
-                e = curr_eq->children[1];
-            }
-            else if (checkType(curr_eq->children[1]->data, "identifier"))
-            {
-                x = curr_eq->children[1];
-                e = curr_eq->children[0];
-            }
-            else
-            {
-                throw std::invalid_argument("Invalid syntax: Expected an identifier");
-            }
-
-            comma->children.push_back(x);
-
-            tau->children.push_back(e);
-
-            delete curr_eq;
-        }
     }
 };
 
