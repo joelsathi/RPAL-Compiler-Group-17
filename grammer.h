@@ -297,6 +297,36 @@ private:
     // Ama
     void A()
     {
+        if ((this->curr_token.compare("+")) == 0)
+        {
+            // std::cout << "Consuming " << this->token << " in A()" << endl;
+            consume("+");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            At();
+        }
+           
+        else if ((this->curr_token.compare("-")) == 0)
+        {
+            consume("-");
+            At();
+            this->AST.build_tree("neg", 1);
+            
+        }
+        else
+        {       
+            A();
+            if ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
+            {
+                string temp = this->curr_token;
+                // std::cout << "Consuming " << this->token << " in A()" << endl;
+                consume(this->curr_token);
+                // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
+                At();
+
+                // std::cout << "Building node " << temp << endl;
+                this->AST.build_tree(temp, 2);
+            }
+        }
     }
 
     void At()
