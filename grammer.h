@@ -96,6 +96,49 @@ private:
     // Ama 
     void E()
     {
+        if ((this->curr_token.compare("let")) == 0)
+        {
+            // std::cout << "Consuming " << this->token << " in Tc()" << endl;
+            consume("let");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            D();
+            // std::cout << "Consuming " << this->token << " in Tc()" << endl;
+            if ((this->curr_token.compare("in")) == 0)
+                consume("in");
+            else
+                throw std::runtime_error("Can't parse the given input! \'in\' is missing");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            E();
+
+            // std::cout << "Building node ->" << endl;
+            this->AST.build_tree("let", 2);
+        }
+        else if ((this->curr_token.compare("fn")) == 0)
+        {
+            int cnt=1;
+            // std::cout << "Consuming " << this->token << " in Tc()" << endl;
+            consume("fn");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            D();
+            // std::cout << "Consuming " << this->token << " in Tc()" << endl;
+            while ((this->curr_token.compare(".")) != 0)
+            {
+                Vb();
+                cnt++;
+            }
+            consume(".")
+                
+            else
+                throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            E();
+
+            // std::cout << "Building node ->" << endl;
+            this->AST.build_tree("lambda", cnt);
+        }
+        else{
+            Ew();
+        }
         
     }
 
