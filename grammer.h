@@ -96,6 +96,54 @@ private:
     // Ama 
     void E()
     {
+        if ((this->curr_token.compare("let")) == 0)
+        {
+            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            consume("let");
+            // std::cout << "Calling D from E with cur Token -> " << this->token << endl;
+            D();
+            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            if ((this->curr_token.compare("in")) == 0)
+                consume("in");
+            else
+                throw std::runtime_error("Can't parse the given input! \'in\' is missing");
+            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
+            E();
+
+            // std::cout << "Building node let" << endl;
+            this->AST.build_tree("let", 2);
+        }
+        else if ((this->curr_token.compare("fn")) == 0)
+        {
+            int cnt=1;
+            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            consume("fn");
+            // std::cout << "Calling D from E with cur Token -> " << this->token << endl;
+            D();
+            while ((this->curr_token.compare(".")) != 0)
+            {
+                // std::cout << "Calling Vb from E with cur Token -> " << this->token << endl
+                Vb();
+                cnt++;
+            }
+            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            consume(".")
+                
+            else
+            {
+                throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+            }
+            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
+            E();
+
+            // std::cout << "Building node lambda" << endl;
+            this->AST.build_tree("lambda", cnt);
+        }
+        else{
+            // std::cout << "Calling EW from E with cur Token -> " << this->token << endl;
+            Ew();
+        }
+        
     }
 
     void Ew()
@@ -253,6 +301,36 @@ private:
     // Ama
     void A()
     {
+        if ((this->curr_token.compare("+")) == 0)
+        {
+            // std::cout << "Consuming " << this->token << " in A()" << endl;
+            consume("+");
+            // std::cout << "Calling At from A with cur Token -> " << this->token << endl;
+            At();
+        }
+        else if ((this->curr_token.compare("-")) == 0)
+        {
+            // std::cout << "Consuming " << this->token << " in A()" << endl;
+            consume("-");
+            // std::cout << "Calling At from A with cur Token -> " << this->token << endl;
+            At();
+            this->AST.build_tree("neg", 1);   
+        }
+        else
+        {       
+            A();
+            while((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
+            {
+                string temp = this->curr_token;
+                // std::cout << "Consuming " << this->token << " in A()" << endl;
+                consume(this->curr_token);
+                // std::cout << "Calling At from A with cur Token -> " << this->curr_token << endl;
+                At();
+
+                // std::cout << "Building node + or - " << temp << endl;
+                this->AST.build_tree(temp, 2);
+            }
+        }
     }
 
     void At()
