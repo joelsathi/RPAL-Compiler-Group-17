@@ -93,7 +93,7 @@ private:
         }
     }
 
-    // Ama 
+    // Ama
     void E()
     {
         if ((this->curr_token.compare("let")) == 0)
@@ -115,7 +115,7 @@ private:
         }
         else if ((this->curr_token.compare("fn")) == 0)
         {
-            int cnt=1;
+            int cnt = 1;
             // std::cout << "Consuming " << this->token << " in E()" << endl;
             consume("fn");
             // std::cout << "Calling D from E with cur Token -> " << this->token << endl;
@@ -127,23 +127,20 @@ private:
                 cnt++;
             }
             // std::cout << "Consuming " << this->token << " in E()" << endl;
-            consume(".")
-                
-            else
-            {
-                throw std::runtime_error("Can't parse the given input! \'.\' is missing");
-            }
-            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
+            consume(".");
+            else throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+
             E();
 
             // std::cout << "Building node lambda" << endl;
             this->AST.build_tree("lambda", cnt);
         }
-        else{
+        else
+        {
             // std::cout << "Calling EW from E with cur Token -> " << this->token << endl;
             Ew();
         }
-        
     }
 
     void Ew()
@@ -314,10 +311,10 @@ private:
             consume("-");
             // std::cout << "Calling At from A with cur Token -> " << this->token << endl;
             At();
-            this->AST.build_tree("neg", 1);   
+            this->AST.build_tree("neg", 1);
         }
         else
-        {       
+        {
             A();
             if ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
             {
