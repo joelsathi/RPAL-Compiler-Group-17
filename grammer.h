@@ -128,7 +128,14 @@ private:
             }
             // std::cout << "Consuming " << this->token << " in E()" << endl;
             consume(".");
+<<<<<<< HEAD
             else throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+=======
+            else 
+            {    
+            throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+            }
+>>>>>>> 365791eeedb4dd35d8f10de697c9442f78250bee
             // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
 
             E();
@@ -316,7 +323,7 @@ private:
         else
         {
             A();
-            if ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
+            while((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
             {
                 string temp = this->curr_token;
                 // std::cout << "Consuming " << this->token << " in A()" << endl;
