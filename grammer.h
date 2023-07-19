@@ -129,7 +129,7 @@ private:
             // std::cout << "Consuming " << this->token << " in E()" << endl;
             consume(".");
             else throw std::runtime_error("Can't parse the given input! \'.\' is missing");
-            // std::cout << "Calling Tc from Tc with cur Token -> " << this->token << endl;
+            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
 
             E();
 
