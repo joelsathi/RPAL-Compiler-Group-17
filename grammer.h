@@ -319,7 +319,7 @@ private:
         }
         else
         {
-            A();
+            At();
             while ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
             {
                 string temp = this->curr_token;
