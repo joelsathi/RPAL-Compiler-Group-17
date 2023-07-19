@@ -132,10 +132,9 @@ private:
             else throw std::runtime_error("Can't parse the given input! \'.\' is missing");
 =======
             else 
-            {    
-            throw std::runtime_error("Can't parse the given input! \'.\' is missing");
+            {
+                throw std::runtime_error("Can't parse the given input! \'.\' is missing");
             }
->>>>>>> 365791eeedb4dd35d8f10de697c9442f78250bee
             // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
 
             E();
