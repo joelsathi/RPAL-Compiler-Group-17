@@ -355,7 +355,7 @@ private:
         }
         else
         {       
-            A();
+            At();
             while((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
             {
                 string temp = this->curr_token;
@@ -374,7 +374,7 @@ private:
     {
         // std::cout << "Calling Af from At with cur Token -> " << this->curr_token << endl;
         Af();
-        if ((this->curr_token.compare("*")) == 0 | (this->curr_token.compare("/")) == 0)
+        while ((this->curr_token.compare("*")) == 0 | (this->curr_token.compare("/")) == 0)
         {
             string temp = this->curr_token;
             // std::cout << "Consuming " << this->token << " in At()" << endl;
