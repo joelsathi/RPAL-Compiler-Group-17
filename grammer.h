@@ -129,7 +129,7 @@ private:
             // std::cout << "Consuming " << this->token << " in E()" << endl;
             consume(".");
 
-            else
+            if (cnt==1)
             {
                 throw std::runtime_error("Can't parse the given input! \'.\' is missing");
             }
