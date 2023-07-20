@@ -390,11 +390,17 @@ private:
     // Ravindu
     void Af()
     {
+        // std::cout << "Calling Ap from Af with cur Token -> " << this->curr_token << endl;
         Ap();
         while ((this->curr_token.compare("**"))==0)
         {
+            // std::cout << "Consuming " << this->curr_token << " in Af()" << endl;
             consume("**");
+
+            // std::cout << "Calling Ap from Af with cur Token -> " << this->curr_token << endl;
             Ap();
+
+            // std::cout << "Building node **" << endl;
             this->AST.build_tree("**",2);
         }
     }
