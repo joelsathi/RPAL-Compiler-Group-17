@@ -129,16 +129,18 @@ private:
             // std::cout << "Consuming " << this->token << " in E()" << endl;
             consume(".");
 
-            if (cnt==1)
+            if (cnt>1)
+            {
+                // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
+                E();
+
+                // std::cout << "Building node lambda" << endl;
+                this->AST.build_tree("lambda", cnt);
+            }
+            else 
             {
                 throw std::runtime_error("Can't parse the given input! \'.\' is missing");
             }
-            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
-
-            E();
-
-            // std::cout << "Building node lambda" << endl;
-            this->AST.build_tree("lambda", cnt);
         }
         else
         {
