@@ -217,6 +217,51 @@ private:
     // Ravindu
     void standadize_fcn_form(Node *node)
     {
+        /* last two child nodes are detached, and they are attached to a new lambda node.
+         * The new lambda node is attached again to the node(fcn_form).
+         * Do above 2 steps until we end up with two child nodes (left child = p, right child = lambda)
+         * change fcn_form to =.
+         * */
+        if (node->children.size()>=3)
+        {
+            while (node->children.size()>2)
+            {
+                if(checkType(node->children[node->children.size()-2]->data, "identifier"))
+                {
+                    Node *lambda = new Node();
+                    lambda->data="lambda";
+
+                    Node *child_right = node->children.back();
+                    node->children.pop_back();
+
+                    Node *child_left = node->children.back();
+                    node->children.pop_back();
+
+                    lambda->children.push_back(child_left);
+                    lambda->children.push_back(child_right);
+
+                    node->children.push_back(lambda);
+                }
+                else
+                {
+                    throw std::invalid_argument("Invalid syntax: Expected an identifier");
+                }
+            }
+
+            if(checkType(node->children[0]->data, "identifier"))
+            {
+                node->data = "=";
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid syntax: Expected an identifier");
+            }
+
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid function form");
+        }
     }
 
     // Ama
@@ -360,6 +405,36 @@ private:
     // Ravindu
     void standardize_and(Node *node)
     {
+        Node *comma = new Node();
+        Node *tau = new Node();
+
+        comma->data = ",";
+        tau->data = "tau";
+
+        while (!node->children.empty())
+        {
+            Node *child = node->children[0];
+            node->children.erase(node->children.begin());
+
+            if (checkType(child->children[0]->data,"identifier"))
+            {
+                comma->children.push_back(child->children[0]);
+                tau->children.push_back(child->children[1]);
+            }
+            else if (checkType(child->children[1]->data,"identifier"))
+            {
+                comma->children.push_back(child->children[1]);
+                tau->children.push_back(child->children[0]);
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid syntax: Expected an identifier");
+            }
+
+        }
+        node->data = "=";
+        node->children.push_back(comma);
+        node->children.push_back(tau);
     }
 };
 
