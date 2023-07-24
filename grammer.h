@@ -299,6 +299,43 @@ private:
     // Ravindu
     void Bp()
     {
+        A();
+       if((this->curr_token.compare("gr"))==0 | (this->curr_token.compare(">"))==0)
+       {
+           consume(this->curr_token);
+           A();
+           this->AST.build_tree("gr",2);
+       }
+        if((this->curr_token.compare("ge"))==0 | (this->curr_token.compare(">="))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ge",2);
+        }
+        if((this->curr_token.compare("ls"))==0 | (this->curr_token.compare("<"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ls",2);
+        }
+        if((this->curr_token.compare("le"))==0 | (this->curr_token.compare("<="))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("le",2);
+        }
+        if((this->curr_token.compare("eq"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("eq",2);
+        }
+        if((this->curr_token.compare("ne"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ne",2);
+        }
     }
 
     // Ama
@@ -323,6 +360,7 @@ private:
         {
             At();
             while ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
+
             {
                 string temp = this->curr_token;
                 // std::cout << "Consuming " << this->token << " in A()" << endl;
@@ -356,6 +394,13 @@ private:
     // Ravindu
     void Af()
     {
+        Ap();
+        while ((this->curr_token.compare("**"))==0)
+        {
+            consume("**");
+            Ap();
+            this->AST.build_tree("**",2);
+        }
     }
 
     void Ap()
