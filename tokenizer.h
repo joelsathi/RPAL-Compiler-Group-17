@@ -16,11 +16,24 @@ class Tokenizer{
         }
 
         vector<string> tokenize(){
-            return;
+            return this->tokens;
         }
         
     private:
         string input;
+        vector<string> tokens;
+
+        vector<char> operator_symbols = {
+            '+', '-', '*', '<', '>', '&', '.', 
+            '@', '/', ':', '=', '~', '|', '$', 
+            '!', '#', '%', '^', '[', ']', 
+            '{', '}', '?', '(', ')', ','
+        };
+
+        // Ama
+        void lexer(){
+            // Go through the input string and tokenize it
+        }
 };
 
 #endif
