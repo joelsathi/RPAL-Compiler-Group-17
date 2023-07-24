@@ -157,61 +157,45 @@ private:
     // Ama
     void standardize_let(Node *node)
     {
+        Node *eq_node = node->children[0];
+        Node *p_node = node->children[1];
+
+        Node *x_node = eq_node->children[0];
+        Node *e_node = eq_node->children[1];
+
+        node->children.clear();
+        eq_node->children.clear();
+
+        node->data = "gamma";
+        eq_node->data = "lambda";
+
+        eq_node->children.push_back(x_node);
+        eq_node->children.push_back(p_node);
+
+        node->children.push_back(eq_node);
+        node->children.push_back(e_node);
     }
 
     void standardize_where(Node *node)
     {
-        Node *child_0 = node->children[0];
-        Node *child_1 = node->children[1];
 
-        Node *eq;
-        Node *p;
-        Node *e;
+        Node *p_node = node->children[0];
+        Node *eq_node = node->children[1];
 
-        if (child_0->data.compare("=") == 0)
-        {
-            eq = child_0;
-            p = child_1;
-        }
-        else if (child_1->data.compare("=") == 0)
-        {
-            eq = child_1;
-            p = child_0;
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid where expression");
-        }
+        Node *x_node = eq_node->children[0];
+        Node *e_node = eq_node->children[1];
 
-        Node *x;
-        Node *e;
-
-        if (checkType(eq->children[0]->data, "identifier"))
-        {
-            x = eq->children[0];
-            e = eq->children[1];
-        }
-        else if (checkType(eq->children[1]->data, "identifier"))
-        {
-            x = eq->children[1];
-            e = eq->children[0];
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid syntax: Expected an identifier");
-        }
+        node->children.clear();
+        eq_node->children.clear();
 
         node->data = "gamma";
-        node->children.clear();
+        eq_node->data = "lambda";
 
-        eq->data = "lambda";
-        eq->children.clear();
+        eq_node->children.push_back(x_node);
+        eq_node->children.push_back(p_node);
 
-        eq->children.push_back(x);
-        eq->children.push_back(p);
-
-        node->children.push_back(eq);
-        node->children.push_back(e);
+        node->children.push_back(eq_node);
+        node->children.push_back(e_node);
     }
 
     // Ravindu
@@ -219,10 +203,7 @@ private:
     {
     }
 
-    // Ama
-    void standardize_lambda(Node *node)
-    {
-    }
+    // Ama- lambda node
 
     void standardize_within(Node *node)
     {
