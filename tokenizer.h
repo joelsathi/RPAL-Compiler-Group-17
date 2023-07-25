@@ -6,20 +6,78 @@
 #include <vector>
 #include <regex>
 #include <stdexcept>
+#include <fstream> 
 
 using namespace std;
 
 class Tokenizer
 {
 public:
-    Tokenizer(string input)
+    Tokenizer()
     {
-        this->input = input;
+        // this->input = input;
     }
 
-    vector<string> tokenize()
+    vector<string> tokenize(int argc, char **argv)
     {
+        if (argc != 2)
+        {
+            cout << "Please provide the input file path" << endl;
+            exit(1);
+        }
+        string file_path = argv[1];
+        read_file(file_path);
+        this->lexer();
+        print_tokens();
         return this->tokens;
+    }
+
+    // FIXME: change this to read the file by getting the file path from command line
+    void read_file(string file_path)
+    {
+        // Read the input file from Test_cases folder
+        ifstream input_file(file_path);
+        string line;
+        string input = "";
+        if (input_file.is_open())
+        {
+            while (getline(input_file, line))
+            {
+                // remove the spaces or tabs that are in the beginning of the line
+                string new_line = "";
+                bool found = false;
+                for (int i = 0; i < line.length(); i++)
+                {
+                    // int val = line[i];
+                    if (line[i] == ' ' || line[i] == '\t')
+                    {
+                        if (found)
+                        {
+                            new_line += line[i];
+                        }
+                        // found = true;
+                    }
+                    else
+                    {
+                        int val = line[i];
+                        // std::cout << val << '\n';
+                        // break;
+                        found = true;
+                        new_line += line[i];
+                    }
+                }
+                // std::cout << new_line << '\n';
+                input += line;
+                input += "\n";
+            }
+            input_file.close();
+            this->input = input;
+            // std::cout << input << endl;
+        }
+        else
+        {
+            std::cout << "Unable to open file";
+        }
     }
 
 private:
@@ -31,6 +89,12 @@ private:
         '@', '/', ':', '=', '~', '|', '$',
         '!', '#', '%', '^', '[', ']',
         '{', '}', '?', '(', ')', ','};
+    
+    void print_tokens(){
+        for (string token : tokens){
+            cout << token << endl;
+        }
+    }
 
     // Ama
     void lexer()
@@ -44,8 +108,9 @@ private:
         bool isString = false;
         char stringDelimiter; // To store the string delimiter (single quote character)
         // Loop through each character in the input string
-        for (char ch : input)
+        for (int i=0; i<input.length(); i++)
         {
+            char ch = input[i];
             // Check if we are inside a comment
             if (isComment)
             {
@@ -66,6 +131,7 @@ private:
                     isString = false;
                 }
                 currentToken += ch; // Add the character to the current token
+                // tokens.push_back(currentToken);
                 continue;
             }
 
@@ -79,10 +145,38 @@ private:
                     currentToken = ""; // Reset the temporary storage
                 }
             }
-            // Check if the current character starts a comment
-            else if (ch == '\\' && currentToken.empty())
+            // Search through the operator_symbols and if it matches
+            else if (find(this->operator_symbols.begin(), this->operator_symbols.end(), ch) != this->operator_symbols.end())
             {
-                isComment = true; // Set the state to inside comment
+                // If we have any other token in the buffer
+                // Push it to the tokens vector
+                if (isString)
+                {
+                    currentToken += ch;
+                    continue;
+                }
+                if (currentToken != "")
+                {
+                    tokens.push_back(currentToken);
+                    currentToken = "";
+                }
+                currentToken += ch;
+
+                if (currentToken == "-" && ((i + 1) < this->input.length()) && (this->input[i + 1] == '>'))
+                {
+                    currentToken += this->input[i + 1];
+                    i++;
+                }
+                else if (currentToken == "/" && ((i + 1) < this->input.length()) && (this->input[i + 1] == '/'))
+                {
+                    isComment = true;
+                    currentToken = "";
+                    continue;
+                }
+                // Now the currentToken is an operator symbol
+                // Push it to the tokens vector
+                tokens.push_back(currentToken);
+                currentToken = "";
             }
             // Check if the current character starts a string
             else if (ch == '\'')
@@ -91,6 +185,7 @@ private:
                 stringDelimiter = ch; // Store the string delimiter
                 currentToken += ch;   // Add the character to the current token
             }
+            
             else
             {
                 // If the current character is not part of a comment or string, add it to the current token
