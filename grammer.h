@@ -96,53 +96,55 @@ private:
     // Ama
     void E()
     {
+        // Let expression
         if ((this->curr_token.compare("let")) == 0)
         {
-            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            // std::cout << "Consuming " << this->curr_token << " in E()" << endl;
             consume("let");
-            // std::cout << "Calling D from E with cur Token -> " << this->token << endl;
+            // std::cout << "Calling D from E with cur curr_token -> " << this->curr_token << endl;
             D();
-            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            // std::cout << "Consuming " << this->curr_token << " in E()" << endl;
             if ((this->curr_token.compare("in")) == 0)
                 consume("in");
             else
-                throw std::runtime_error("Can't parse the given input! \'in\' is missing");
-            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
+                throw std::runtime_error("Can't parse the given input. \'in\' is missing");
+            // std::cout << "Calling E from E with cur curr_token -> " << this->curr_token << endl;
             E();
 
-            // std::cout << "Building node let" << endl;
+            // std::cout << "Building node let" << endl; 
             this->AST.build_tree("let", 2);
         }
+        // Lambda Expression
         else if ((this->curr_token.compare("fn")) == 0)
         {
-            int cnt = 1;
-            // std::cout << "Consuming " << this->token << " in E()" << endl;
+            int cnt = 0;
+            // std::cout << "Consuming " << this->curr_token << " in E()" << endl;
             consume("fn");
-            // std::cout << "Calling D from E with cur Token -> " << this->token << endl;
-            D();
+            // std::cout << "Calling Vb from E with cur curr_token -> " << this->curr_token << endl;
+            Vb();
+            cnt++;
             while ((this->curr_token.compare(".")) != 0)
             {
-                // std::cout << "Calling Vb from E with cur Token -> " << this->token << endl
+                // std::cout << "Calling Vb from E with cur curr_token -> " << this->curr_token << endl;
                 Vb();
                 cnt++;
             }
-            // std::cout << "Consuming " << this->token << " in E()" << endl;
-            consume(".");
-
+            // std::cout << "Consuming " << this->curr_token << " in E()" << endl;
+            if ((this->curr_token.compare(".")) == 0)
+                consume(".");
             else
-            {
                 throw std::runtime_error("Can't parse the given input! \'.\' is missing");
-            }
-            // std::cout << "Calling E from E with cur Token -> " << this->token << endl;
-
+            // std::cout << "Calling E from E with cur curr_token -> " << this->curr_token << endl;
             E();
-
+            cnt++;
+            
             // std::cout << "Building node lambda" << endl;
             this->AST.build_tree("lambda", cnt);
         }
+        // Where case
         else
         {
-            // std::cout << "Calling EW from E with cur Token -> " << this->token << endl;
+            // std::cout << "Calling Ew from E with cur curr_token -> " << this->curr_token << endl;
             Ew();
         }
     }
@@ -297,6 +299,43 @@ private:
     // Ravindu
     void Bp()
     {
+        A();
+       if((this->curr_token.compare("gr"))==0 | (this->curr_token.compare(">"))==0)
+       {
+           consume(this->curr_token);
+           A();
+           this->AST.build_tree("gr",2);
+       }
+        if((this->curr_token.compare("ge"))==0 | (this->curr_token.compare(">="))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ge",2);
+        }
+        if((this->curr_token.compare("ls"))==0 | (this->curr_token.compare("<"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ls",2);
+        }
+        if((this->curr_token.compare("le"))==0 | (this->curr_token.compare("<="))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("le",2);
+        }
+        if((this->curr_token.compare("eq"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("eq",2);
+        }
+        if((this->curr_token.compare("ne"))==0)
+        {
+            consume(this->curr_token);
+            A();
+            this->AST.build_tree("ne",2);
+        }
     }
 
     // Ama
@@ -319,8 +358,9 @@ private:
         }
         else
         {
-            A();
+            At();
             while ((this->curr_token.compare("+")) == 0 | (this->curr_token.compare("-")) == 0)
+
             {
                 string temp = this->curr_token;
                 // std::cout << "Consuming " << this->token << " in A()" << endl;
@@ -354,6 +394,13 @@ private:
     // Ravindu
     void Af()
     {
+        Ap();
+        while ((this->curr_token.compare("**"))==0)
+        {
+            consume("**");
+            Ap();
+            this->AST.build_tree("**",2);
+        }
     }
 
     void Ap()

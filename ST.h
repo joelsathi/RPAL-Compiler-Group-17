@@ -97,10 +97,10 @@ private:
         {
             standardize_where(node);
         }
-        else if (node->data.compare("lambda") == 0 && node->children[0]->data.compare(",") != 0)
-        {
-            standardize_lambda(node);
-        }
+        // else if (node->data.compare("lambda") == 0 && node->children[0]->data.compare(",") != 0)
+        // {
+        //     // standardize_lambda(node);
+        // }
         else if (node->data.compare("within") == 0)
         {
             standardize_within(node);
@@ -201,6 +201,35 @@ private:
     // Ravindu
     void standadize_fcn_form(Node *node)
     {
+        Node* p_node = node->children[0];
+
+        vector<Node*> v_plus_nodes;
+
+        for (int i=1; i<node->children.size()-1; i++){
+            v_plus_nodes.push_back(node->children[i]);
+        }
+
+        Node* e_node = node->children[node->children.size()-1];
+
+        node->children.clear();
+
+        node->data = "=";
+
+        node->children.push_back(p_node);
+
+        Node* cur_node = node;
+
+        for (int i=0; i<v_plus_nodes.size(); i++){
+            Node* lambda_node = new Node();
+            lambda_node->data = "lambda";
+            lambda_node->children.push_back(v_plus_nodes[i]);
+
+            cur_node->children.push_back(lambda_node);
+
+            cur_node = lambda_node;
+        }
+
+        cur_node->children.push_back(e_node);
     }
 
     // Ama- lambda node
@@ -341,6 +370,34 @@ private:
     // Ravindu
     void standardize_and(Node *node)
     {
+        vector<Node*> x_nodes, e_nodes;
+
+        for (int i=0; i<node->children.size(); i++){
+            Node* eq_node = node->children[i];
+
+            Node* x_node = eq_node->children[0];
+            Node* e_node = eq_node->children[1];
+
+            x_nodes.push_back(x_node);
+            e_nodes.push_back(e_node);
+        }
+
+        node->children.clear();
+        node->data = "=";
+
+        Node* comma_node = new Node();
+        comma_node->data = ",";
+
+        Node* tau_node = new Node();
+        tau_node->data = "tau";
+
+        for (int i=0; i<x_nodes.size(); i++){
+            comma_node->children.push_back(x_nodes[i]);
+            tau_node->children.push_back(e_nodes[i]);
+        }
+
+        node->children.push_back(comma_node);
+        node->children.push_back(tau_node);
     }
 };
 
