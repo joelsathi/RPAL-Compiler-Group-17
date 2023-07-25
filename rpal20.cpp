@@ -4,29 +4,93 @@
 #include <regex>
 #include <stdexcept>
 #include "AST.h"
-#include "grammer.h"
+#include "Grammar.h"
 #include "ST.h"
-#include "CSE.h"
 #include "tokenizer.h"
+#include "CSE.h"
+
+#include <fstream>
+#include <cstdlib>
 
 using namespace std;
 
-vector<string> test_cases(int case_num)
+int nodeCounter = 0;
+
+void generateDotFile(Node *root, ofstream &dotFile, int &nodeCounter)
 {
-    vector<vector<string>> testcases = {
-        {"let", "isNeg", "(", "x", ")", "=", "x", "ls", "0", "->", "'Negative'", "|", "'Positive'", "in", "Print", "(", "isNeg", "(", "4", ")", ")"},
-        {"let", "x", "=", "+", "2", "in", "Print", "(", "+", "(", "x", "-", "1", ")", "/", "3", ")"},
-        {"let", "f", "x", "y", "=", "x", "+", "y", "in", "Print", "(", "3", "@", "f", "2", ")"},
-        {"let", "c", "=", "3", "within", "f", "x", "=", "x", "+", "c", "in", "f", "2"},
-        {"let", "x", "=", "3", "in", "let", "y", "=", "4", "in", "x", "+", "y"},
-        {"let", "f", "x", "y", "z", "=", "x", "+", "y", "+", "z", "in", "f", "1", "2", "3"},
-    };
-    return testcases[case_num - 1];
+    if (root == nullptr)
+        return;
+
+    int currentNodeIndex = nodeCounter;
+
+    // if the node has any children then make the shape of the node circle and color it lightblue
+    // otherwise make the shape of the node circle and leave it without any color
+
+    // have to set the radius of the circle to a fixed valu
+
+    if (root->children.size() > 0)
+        dotFile << "node" << currentNodeIndex << " [label=\"" << root->data << "\",shape=circle, style=\"filled\", fillcolor=\"lightblue\", fontcolor=\"black\", fontsize=14, width=1.5];" << endl;
+    else
+        dotFile << "node" << currentNodeIndex << " [label=\"" << root->data << "\",shape=circle, style=\"filled\", fillcolor=\"gray\", fontcolor=\"black\", fontsize=14, width=1.5];" << endl;
+
+    // dotFile << "node" << currentNodeIndex << " [label=\"" << root->data << "\"];" << endl;
+
+    for (Node *child : root->children)
+    {
+        int childNodeIndex = nodeCounter + 1;
+        dotFile << "node" << currentNodeIndex << " -- node" << childNodeIndex << ";" << endl;
+        nodeCounter++;
+        generateDotFile(child, dotFile, nodeCounter);
+    }
+}
+
+void generateTreeDotFile(Node *root, const string &fileName)
+{
+    ofstream dotFile(fileName);
+
+    if (dotFile.is_open())
+    {
+        dotFile << "graph Tree {" << endl;
+        dotFile << "node [shape=box, style=\"filled\", fillcolor=\"lightblue\", fontcolor=\"black\"];" << endl;
+
+        int nodeCounter = 0;
+        generateDotFile(root, dotFile, nodeCounter);
+
+        dotFile << "}" << endl;
+
+        dotFile.close();
+
+        // std::cout << "Dot file '" << fileName << "' generated successfully." << endl;
+    }
+    else
+    {
+        std::cout << "Failed to open dot file." << endl;
+    }
 }
 
 int main(int argc, char **argv)
 {
-    Tokenizer tokenizer = Tokenizer();
-    vector<string> tokens = tokenizer.tokenize(argc, argv);
+
+    Tokenizer tok = Tokenizer();
+
+    vector<string> tokens_to_parse = tok.tokenize(argc, argv);
+    Grammar g = Grammar(tokens_to_parse);
+    g.parse();
+
+    Node *root = g.get_ast_root();
+    // generateTreeDotFile(root, "Generated_Graphs\\ast_tree.dot");
+    // system("dot -Tpng -O Generated_Graphs\\ast_tree.dot");
+    // system("dot -Tpng -Gdpi=300 -O Generated_Graphs\\ast_tree.dot");
+
+    ST st = ST(root);
+    st.standardize();
+
+    Node *st_root = st.get_root();
+    // generateTreeDotFile(st_root, "Generated_Graphs\\st_tree.dot");
+    // system("dot -Tpng -O Generated_Graphs\\st_tree.dot");
+
+    CSE cse = CSE(st_root);
+    cse.solve_CSE();
+
     return 0;
 }

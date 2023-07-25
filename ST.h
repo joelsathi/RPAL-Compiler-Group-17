@@ -9,396 +9,343 @@
 
 using namespace std;
 
-class ST
-{
-public:
-    ST(Node *root)
-    {
-        this->st_root = root;
-    }
+class ST{
+    public:
+        ST(Node* root){
+            this->st_root = root;
+        }
 
-    /**
-     * @brief This will construct the standard tree.
-     *
-     */
-    void standardize()
-    {
-        construct_ST_rec(this->st_root);
-    }
+        Node* get_root(){
+            return this->st_root;
+        }
 
-    /**
-     * @brief This will print the standard tree.
-     *
-     */
-    void print_ST()
-    {
-        std::cout << "==================================" << endl;
-        std::cout << "Printing the Standard Tree ( BFS )" << endl;
-        std::cout << "==================================" << endl;
+        void standardize(){
+            // std::cout << "Constructing the Standard Tree" << std::endl;
+            construct_ST(this->st_root);
+            // print_ST();
+        }
 
-        std::cout << "\n\n"
-                  << endl;
-
-        vector<Node *> queue;
-        queue.push_back(this->st_root);
-
-        while (queue.size() > 0)
-        {
-            Node *cur_node = queue[0];
-            queue.erase(queue.begin());
-            std::cout << "Parent Node -> " << cur_node->data << endl;
-            std::cout << "Children -> " << endl;
-            for (int i = 0; i < cur_node->children.size(); i++)
-            {
-                queue.push_back(cur_node->children[i]);
-                std::cout << "Child Node -> " << cur_node->children[i]->data << endl;
+        void construct_ST(Node* node){
+            for (int i = 0; i < node->children.size(); i++){
+                construct_ST(node->children[i]);
+                // node.children[i] = rec_standardize_AST(node.children[i]);
             }
-            std::cout << "\n\n"
-                      << endl;
-        }
-    }
 
-private:
-    Node *st_root;
-
-    /**
-     * @brief This will construct the standard tree recursively.
-     *
-     * @param node
-     */
-    void construct_ST_rec(Node *node)
-    {
-        for (int i = 0; i < node->children.size(); i++)
-        {
-            construct_ST_rec(node->children[i]);
+            // std::cout << "==================================" << endl;
+            // std::cout << "Standardizing node: " << node.data << std::endl;
+            rec_standardize_AST(node);
+            // std::cout << "Standardized node: " << node->data << std::endl;
+            // std::cout << "==================================" << endl;
         }
 
-        stardardize_node(node);
-    }
+        void print_ST(){
+            std::cout << "==================================" << endl;
+            std::cout << "Printing the Standard Tree ( BFS )" << endl;
+            std::cout << "==================================" << endl;
 
-    /**
-     * @brief This will check the data of the node and standardize by
-     * calling the appropriate function.
-     *
-     * @param node
-     */
-    void stardardize_node(Node *node)
-    {
-        if (node->data.compare("let") == 0)
-        {
-            standardize_let(node);
-        }
-        else if (node->data.compare("fcn_form") == 0)
-        {
-            standadize_fcn_form(node);
-        }
+            std::cout << "\n\n" << endl;
 
-        else if (node->data.compare("where") == 0)
-        {
-            standardize_where(node);
-        }
-        // else if (node->data.compare("lambda") == 0 && node->children[0]->data.compare(",") != 0)
-        // {
-        //     // standardize_lambda(node);
-        // }
-        else if (node->data.compare("within") == 0)
-        {
-            standardize_within(node);
-        }
-        else if (node->data.compare("@") == 0)
-        {
-            standardize_at(node);
-        }
-        else if (node->data.compare("and") == 0)
-        {
-            standardize_and(node);
-        }
-        else if (node->data.compare("rec") == 0)
-        {
-            standardize_rec(node);
-        }
-        else
-        {
-            stardardize_node(node);
-        }
-    }
+            vector<Node*> queue;
+            queue.push_back(this->st_root);
 
-    bool checkType(string token, string str_type)
-    {
-
-        vector<string> keywords = {"let", "in", "fn", "where", "aug",
-                                   "or", "not", "gr", "ge", "ls", "le", "eq", "ne",
-                                   "true", "false", "nil", "dummy", "within", "and",
-                                   "rec", "Isinteger"};
-
-        if (str_type.compare("identifier") == 0)
-        {
-            // We don't want to match a keyword as an identifier
-            if (std::find(keywords.begin(), keywords.end(), token) != keywords.end())
+            while (queue.size() > 0)
             {
-                return false;
+                Node* cur_node = queue[0];
+                queue.erase(queue.begin());
+                std::cout << "Parent Node -> " << cur_node->data << endl;
+                std::cout << "Children -> " << endl;
+                for (int i = 0; i < cur_node->children.size(); i++)
+                {
+                    queue.push_back(cur_node->children[i]);
+                    std::cout << "Child Node -> " << cur_node->children[i]->data << endl;
+                }
+                std::cout << "\n\n" << endl;
+        }
+    }
+
+    private:
+        Node* st_root;
+
+        void rec_standardize_AST(Node* node){
+            if (node->data.compare("let") == 0){
+                // std::cout << "Standardizing let clause" << std::endl;
+                standardize_let(node);
+            }  
+            else if (node->data.compare("where") == 0){
+                // std::cout << "Standardizing where clause" << std::endl;
+                standardize_where(node);
             }
-            regex identifier_pat("[a-zA-Z][a-zA-Z0-9_]*");
-            return regex_match(token, identifier_pat);
-        }
-        else if (str_type.compare("integer") == 0)
-        {
-            regex integer_pat("[0-9]+");
-            return regex_match(token, integer_pat);
-        }
-        else if (str_type.compare("string") == 0)
-        {
-            regex string_pat("\'[^\"]*\'");
-            return regex_match(token, string_pat);
-        }
-        return false;
-    }
-
-    // Ama
-    void standardize_let(Node *node)
-    {
-        Node *eq_node = node->children[0];
-        Node *p_node = node->children[1];
-
-        Node *x_node = eq_node->children[0];
-        Node *e_node = eq_node->children[1];
-
-        node->children.clear();
-        eq_node->children.clear();
-
-        node->data = "gamma";
-        eq_node->data = "lambda";
-
-        eq_node->children.push_back(x_node);
-        eq_node->children.push_back(p_node);
-
-        node->children.push_back(eq_node);
-        node->children.push_back(e_node);
-    }
-
-    void standardize_where(Node *node)
-    {
-
-        Node *p_node = node->children[0];
-        Node *eq_node = node->children[1];
-
-        Node *x_node = eq_node->children[0];
-        Node *e_node = eq_node->children[1];
-
-        node->children.clear();
-        eq_node->children.clear();
-
-        node->data = "gamma";
-        eq_node->data = "lambda";
-
-        eq_node->children.push_back(x_node);
-        eq_node->children.push_back(p_node);
-
-        node->children.push_back(eq_node);
-        node->children.push_back(e_node);
-    }
-
-    // Ravindu
-    void standadize_fcn_form(Node *node)
-    {
-        Node* p_node = node->children[0];
-
-        vector<Node*> v_plus_nodes;
-
-        for (int i=1; i<node->children.size()-1; i++){
-            v_plus_nodes.push_back(node->children[i]);
+            else if (node->data.compare("fcn_form") == 0){
+                // std::cout << "Standardizing fcn_form clause" << std::endl;
+                standardize_fcn_form(node);
+            }
+            else if (node->data.compare("within") == 0){
+                // std::cout << "Standardizing within clause" << std::endl;
+                standardize_within(node);
+            }
+            else if (node->data.compare("and") == 0){
+                // std::cout << "Standardizing and clause" << std::endl;
+                standardize_and(node);
+            }
+            else if (node->data.compare("@") == 0){
+                // std::cout << "Standardizing @ clause" << std::endl;
+                standardize_at(node);
+            }
+            // else if (node->data.compare("lambda") == 0 && node->children[0]->data.compare(",") != 0 && node->children.size() == 2){
+            //     // std::cout << "Standardizing multi parameter function : lambda" << std::endl;
+            //     standardize_lambda(node);
+            // }
+            else if (node->data.compare("rec") == 0){
+                // std::cout << "Standardizing rec clause" << std::endl;
+                standardize_rec(node);
+            }
+            else{
+                // std::cout << "No standardization needed for this node: " << node->data << std::endl;
+            }
         }
 
-        Node* e_node = node->children[node->children.size()-1];
+        bool CheckType(string token, string str_type){
 
-        node->children.clear();
+            vector<string> keywords = {"let", "in", "fn", "where", "aug",
+                               "or", "not", "gr", "ge", "ls", "le", "eq", "ne",
+                               "true", "false", "nil", "dummy", "within", "and", 
+                               "rec"};
 
-        node->data = "=";
-
-        node->children.push_back(p_node);
-
-        Node* cur_node = node;
-
-        for (int i=0; i<v_plus_nodes.size(); i++){
-            Node* lambda_node = new Node();
-            lambda_node->data = "lambda";
-            lambda_node->children.push_back(v_plus_nodes[i]);
-
-            cur_node->children.push_back(lambda_node);
-
-            cur_node = lambda_node;
+            if (str_type.compare("identifier") == 0)
+            {
+                // We don't want to match a keyword as an identifier
+                if (std::find(keywords.begin(), keywords.end(), token) != keywords.end())
+                {
+                    return false;
+                }
+                regex identifier_pat("[a-zA-Z][a-zA-Z0-9_]*");
+                return regex_match(token, identifier_pat);
+            }
+            else if (str_type.compare("integer") == 0)
+            {
+                regex integer_pat("[0-9]+");
+                return regex_match(token, integer_pat);
+            }
+            else if (str_type.compare("string") == 0)
+            {
+                regex string_pat("\'[^\"]*\'");
+                return regex_match(token, string_pat);
+            }
+            return false;
         }
 
-        cur_node->children.push_back(e_node);
-    }
+        void standardize_let(Node* node){
+            Node* eq_child = node->children[0];
+            Node* p_child = node->children[1];
 
-    // Ama- lambda node
+            Node* x_node = eq_child->children[0];
+            Node* e_node = eq_child->children[1];
 
-    void standardize_within(Node *node)
-    {
-        Node *eq1 = node->children[0];
-        Node *eq2 = node->children[1];
+            node->children.clear();
+            eq_child->children.clear();
 
-        if (eq1->data.compare("=") != 0 || eq2->data.compare("=") != 0)
-        {
-            throw std::invalid_argument("Invalid within expression");
+            node->data = "gamma";
+            eq_child->data = "lambda";
+
+            eq_child->children.push_back(x_node);
+            eq_child->children.push_back(p_child);
+
+            node->children.push_back(eq_child);
+            node->children.push_back(e_node);
         }
 
-        Node *x1;
-        Node *e1;
-
-        if (checkType(eq1->children[0]->data, "identifier"))
-        {
-            x1 = eq1->children[0];
-            e1 = eq1->children[1];
-        }
-        else if (checkType(eq1->children[1]->data, "identifier"))
-        {
-            x1 = eq1->children[1];
-            e1 = eq1->children[0];
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid syntax: Expected an identifier");
-        }
-
-        Node *x2;
-        Node *e2;
-
-        if (checkType(eq2->children[0]->data, "identifier"))
-        {
-            x2 = eq2->children[0];
-            e2 = eq2->children[1];
-        }
-        else if (checkType(eq2->children[1]->data, "identifier"))
-        {
-            x2 = eq2->children[1];
-            e2 = eq2->children[0];
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid syntax: Expected an identifier");
-        }
-
-        node->data = "=";
-        node->children.clear();
-
-        eq1->data = "lambda";
-        eq1->children.clear();
-        eq2->data = "gamma";
-        eq2->children.clear();
-
-        eq1->children.push_back(x1);
-        eq1->children.push_back(e2);
-
-        eq2->children.push_back(eq1);
-        eq2->children.push_back(e1);
-
-        node->children.push_back(x2);
-        node->children.push_back(eq2);
-    }
-
-    void standardize_at(Node *node)
-    {
-        Node *e1 = node->children[0];
-        Node *n = node->children[1];
-        Node *e2 = node->children[2];
-
-        node->data = "gamma";
-        node->children.clear();
-
-        Node *gamma2 = new Node();
-        gamma2->data = "gamma";
-
-        node->children.push_back(gamma2);
-        node->children.push_back(e2);
-
-        gamma2->children.push_back(n);
-        gamma2->children.push_back(e1);
-    }
-
-    void standardize_rec(Node *node)
-    {
-        Node *rec_node = node->children[0];
-        Node *eq_node = node->children[1];
-
-        if (eq_node->data.compare("=") != 0)
-        {
-            throw std::invalid_argument("Invalid rec expression");
-        }
-
-        Node *x;
-        Node *e;
-
-        if (checkType(eq_node->children[0]->data, "identifier"))
-        {
-            x = eq_node->children[0];
-            e = eq_node->children[1];
-        }
-        else if (checkType(eq_node->children[1]->data, "identifier"))
-        {
-            x = eq_node->children[1];
-            e = eq_node->children[0];
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid syntax: Expected an identifier");
-        }
-
-        rec_node->data = "=";
-        rec_node->children.clear();
-
-        eq_node->data = "gamma";
-        eq_node->children.clear();
-
-        Node *y_node = new Node();
-        y_node->data = "Y";
-
-        Node *lambda_node = new Node();
-        lambda_node->data = "lambda";
-
-        eq_node->children.push_back(y_node);
-        eq_node->children.push_back(lambda_node);
-
-        lambda_node->children.push_back(x);
-        lambda_node->children.push_back(e);
-
-        rec_node->children.push_back(x);
-        rec_node->children.push_back(eq_node);
-    }
-
-    // Ravindu
-    void standardize_and(Node *node)
-    {
-        vector<Node*> x_nodes, e_nodes;
-
-        for (int i=0; i<node->children.size(); i++){
-            Node* eq_node = node->children[i];
+        void standardize_where(Node* node){
+            Node* p_node = node->children[0];
+            Node* eq_node = node->children[1];
 
             Node* x_node = eq_node->children[0];
             Node* e_node = eq_node->children[1];
 
-            x_nodes.push_back(x_node);
-            e_nodes.push_back(e_node);
+            node->children.clear();
+            eq_node->children.clear();
+
+            node->data = "gamma";
+            eq_node->data = "lambda";
+
+            eq_node->children.push_back(x_node);
+            eq_node->children.push_back(p_node);
+
+            node->children.push_back(eq_node);
+            node->children.push_back(e_node);
         }
 
-        node->children.clear();
-        node->data = "=";
+        void standardize_fcn_form(Node* node){
+            Node* p_node = node->children[0];
 
-        Node* comma_node = new Node();
-        comma_node->data = ",";
+            vector<Node*> v_plus_nodes;
 
-        Node* tau_node = new Node();
-        tau_node->data = "tau";
+            for (int i=1; i<node->children.size()-1; i++){
+                v_plus_nodes.push_back(node->children[i]);
+            }
 
-        for (int i=0; i<x_nodes.size(); i++){
-            comma_node->children.push_back(x_nodes[i]);
-            tau_node->children.push_back(e_nodes[i]);
+            Node* e_node = node->children[node->children.size()-1];
+
+            node->children.clear();
+
+            node->data = "=";
+
+            node->children.push_back(p_node);
+
+            Node* cur_node = node;
+
+            for (int i=0; i<v_plus_nodes.size(); i++){
+                Node* lambda_node = new Node();
+                lambda_node->data = "lambda";
+                lambda_node->children.push_back(v_plus_nodes[i]);
+
+                cur_node->children.push_back(lambda_node);
+
+                cur_node = lambda_node;
+            }
+
+            cur_node->children.push_back(e_node);
         }
 
-        node->children.push_back(comma_node);
-        node->children.push_back(tau_node);
-    }
+        // void standardize_lambda(Node* node){
+        //     vector<Node*> variables;
+
+        //     int i = 0;
+
+        //     while (CheckType(node->children[i]->data, "identifier")){
+        //         variables.push_back(node->children[i]);
+        //         i++;
+        //     }
+
+        //     Node* e_node = node->children[i];
+
+        //     node->children.clear();
+
+        //     node->children.push_back(variables[0]);
+
+        //     for (int i = 1; i < variables.size(); i++){
+        //         Node* lambda_node = new Node();
+        //         lambda_node->data = "lambda";
+        //         lambda_node->children.push_back(variables[i]);
+        //         node->children.push_back(lambda_node);
+        //         node = lambda_node;
+        //     }
+
+        //     node->children.push_back(e_node);
+        // }
+
+        void standardize_within(Node* node){
+            Node* eq_node1 = node->children[0];
+            Node* eq_node2 = node->children[1];
+
+            Node* x_node1 = eq_node1->children[0];
+            Node* e_node1 = eq_node1->children[1];
+
+            Node* x_node2 = eq_node2->children[0];
+            Node* e_node2 = eq_node2->children[1];
+
+            node->children.clear();
+            eq_node1->children.clear();
+            eq_node2->children.clear();
+
+            node->data = "=";
+
+            node->children.push_back(x_node2);
+
+            Node* gamma_node = new Node();
+            gamma_node->data = "gamma";
+
+            Node* lambda_node = new Node();
+            lambda_node->data = "lambda";
+
+            lambda_node->children.push_back(x_node1);
+            lambda_node->children.push_back(e_node2);
+
+            gamma_node->children.push_back(lambda_node);
+            gamma_node->children.push_back(e_node1);
+
+            node->children.push_back(gamma_node);
+        }
+
+        void standardize_at(Node* node){
+            Node* e1 = node->children[0];
+            Node* n = node->children[1];
+            Node* e2 = node->children[2];
+
+            // Node* new_root = new Node();
+            node->data = "gamma";
+            node->children.clear();
+
+            Node* gamma_node = new Node();
+            gamma_node->data = "gamma";
+
+            gamma_node->children.push_back(n);
+            gamma_node->children.push_back(e1);
+
+            node->children.push_back(gamma_node);
+            node->children.push_back(e2);
+
+            // return new_root;
+        }
+
+        void standardize_and(Node* node){
+            vector<Node*> x_nodes, e_nodes;
+
+            for (int i=0; i<node->children.size(); i++){
+                Node* eq_node = node->children[i];
+
+                Node* x_node = eq_node->children[0];
+                Node* e_node = eq_node->children[1];
+
+                x_nodes.push_back(x_node);
+                e_nodes.push_back(e_node);
+            }
+
+            node->children.clear();
+            node->data = "=";
+
+            Node* comma_node = new Node();
+            comma_node->data = ",";
+
+            Node* tau_node = new Node();
+            tau_node->data = "tau";
+
+            for (int i=0; i<x_nodes.size(); i++){
+                comma_node->children.push_back(x_nodes[i]);
+                tau_node->children.push_back(e_nodes[i]);
+            }
+
+            node->children.push_back(comma_node);
+            node->children.push_back(tau_node);
+        }
+
+        void standardize_rec(Node* node){
+            Node* eq_node = node->children[0];
+
+            Node* x_node = eq_node->children[0];
+            Node* e_node = eq_node->children[1];
+
+            node->children.clear();
+            node->data = "=";
+
+            Node* gamma_node = new Node();
+            gamma_node->data = "gamma";
+
+            Node* lambda_node = new Node();
+            lambda_node->data = "lambda";
+
+            Node* y_star_node = new Node();
+            y_star_node->data = "Y*";
+
+            lambda_node->children.push_back(x_node);
+            lambda_node->children.push_back(e_node);
+
+            gamma_node->children.push_back(y_star_node);
+            gamma_node->children.push_back(lambda_node);
+
+            node->children.push_back(x_node);
+            node->children.push_back(gamma_node);
+        }
+
 };
 
 #endif
