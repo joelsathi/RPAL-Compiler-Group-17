@@ -84,6 +84,7 @@ public:
 private:
     string input;
     vector<string> tokens;
+    vector<string> lex;
 
     vector<char> operator_symbols = {
         '+', '-', '*', '<', '>', '&', '.',
@@ -108,8 +109,49 @@ private:
     }
 
     // Ravindu
-    void validate_tokens(){
+    void validate_tokens() {
+        regex identifier_pattern("[a-zA-Z][a-zA-Z0-9_]*");
 
+        regex integer_pattern("[0-9]+");
+
+        regex op_pattern(R"([+\-*<>&.@/:=~|$!#%^_\[\]{}"`?]+)");
+
+        regex string_pattern("\'[^\"]*\'");
+
+        regex space_pattern(R"(\s+)");
+
+
+
+
+        int i = 0;
+        while (i < this->tokens.size()) {
+            string token = this->tokens[0];
+
+            if (regex_match(token, identifier_pattern)) {
+                this->lex.emplace_back("identifier");
+            } else if (regex_match(token, integer_pattern)) {
+                this->lex.emplace_back("integer");
+            } else if (regex_match(token, op_pattern)) {
+                this->lex.emplace_back("operator");
+            } else if (regex_match(token, string_pattern)) {
+                this->lex.emplace_back("string");
+            } else if (token == "(") {
+                this->lex.emplace_back("(");
+            } else if (token == ")") {
+                this->lex.emplace_back(")");
+            } else if (token == ";") {
+                this->lex.emplace_back(";");
+            } else if (token == ",") {
+                this->lex.emplace_back(",");
+            } else if (regex_match(token, space_pattern)) {
+                continue;
+            }
+            else
+            {
+                std::cout << "Invalid Token" << endl;
+                std::exit(0);
+            }
+        }
     }
 
     // Ama
