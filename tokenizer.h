@@ -28,7 +28,8 @@ public:
         string file_path = argv[1];
         read_file(file_path);
         this->lexer();
-        print_tokens();
+        // print_tokens();
+        this->validate_tokens();
         return this->tokens;
     }
 
@@ -96,6 +97,21 @@ private:
         }
     }
 
+    void push_token(string token)
+    {
+        int val = token[0];
+        if (token == "" || val == 13|| val == 0)
+        {
+            return;
+        }
+        this->tokens.push_back(token);
+    }
+
+    // Ravindu
+    void validate_tokens(){
+
+    }
+
     // Ama
     void lexer()
 
@@ -141,7 +157,7 @@ private:
                 // If the current token is not empty, add it to the list of tokens
                 if (!currentToken.empty())
                 {
-                    tokens.push_back(currentToken);
+                    this->push_token(currentToken);
                     currentToken = ""; // Reset the temporary storage
                 }
             }
@@ -157,7 +173,7 @@ private:
                 }
                 if (currentToken != "")
                 {
-                    tokens.push_back(currentToken);
+                    this->push_token(currentToken);
                     currentToken = "";
                 }
                 currentToken += ch;
@@ -175,7 +191,7 @@ private:
                 }
                 // Now the currentToken is an operator symbol
                 // Push it to the tokens vector
-                tokens.push_back(currentToken);
+                this->push_token(currentToken);
                 currentToken = "";
             }
             // Check if the current character starts a string
@@ -196,7 +212,7 @@ private:
         // Add the last token (if any) after the loop finishes
         if (!currentToken.empty())
         {
-            tokens.push_back(currentToken);
+            this->push_token(currentToken);
         }
     }
 };
