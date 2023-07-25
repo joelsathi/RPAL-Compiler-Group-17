@@ -34,6 +34,7 @@ private:
 
     // Ama
     void lexer()
+
     {
         // Temporary storage for building a token
         string currentToken = "";
