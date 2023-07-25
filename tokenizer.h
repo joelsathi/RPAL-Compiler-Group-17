@@ -125,7 +125,8 @@ private:
 
         int i = 0;
         while (i < this->tokens.size()) {
-            string token = this->tokens[0];
+            string token = this->tokens[i];
+            i++;
 
             if (regex_match(token, identifier_pattern)) {
                 this->lex.emplace_back("identifier");
