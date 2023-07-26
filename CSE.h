@@ -1347,14 +1347,19 @@ class CSE{
                 res += elem.bool_var ? "true" : "false";
             }
             else if (elem.is_tuple_var){
-                res += "(";
-                for (int i=0; i<elem.tuple_elements.size(); i++){
-                    res += print_ctrl_and_stack_var(elem.tuple_elements[i]);
-                    if (i != elem.tuple_elements.size()-1){
-                        res += ", ";
-                    }
+                if (elem.tuple_elements.size() == 0){
+                    res += "nil";
                 }
-                res += ")";
+                else{
+                    res += "(";
+                    for (int i=0; i<elem.tuple_elements.size(); i++){
+                        res += print_ctrl_and_stack_var(elem.tuple_elements[i]);
+                        if (i != elem.tuple_elements.size()-1){
+                            res += ", ";
+                        }
+                    }
+                    res += ")";
+                }
             }
             else if (elem.is_lambda_var){
                 res += "[lambda closure: " + elem.lambda.bdd_vars[0] + ": " + to_string(elem.lambda.ctrl_no) + "]";
